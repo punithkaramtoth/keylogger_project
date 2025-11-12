@@ -1,5 +1,6 @@
 streamlit
 pynput
-opencv-python
+opencv-python-headless
 pyautogui
 geocoder
+
