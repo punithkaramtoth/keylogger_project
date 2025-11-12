@@ -15,4 +15,5 @@
 1. Install dependencies:
 
 ```bash
+pip install opencv-python
 pip install -r requirements.txt
