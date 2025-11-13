@@ -1,70 +1,63 @@
-from flask import Flask, request, render_template_string
-import threading
+import streamlit as st
 
-# Shared variable to store GPS info
-gps_data = {"latitude": None, "longitude": None, "accuracy": None}
+# Initialize GPS storage in session state
+if "gps_data" not in st.session_state:
+    st.session_state.gps_data = {"latitude": None, "longitude": None, "accuracy": None}
 
-# Create Flask app
-app = Flask(__name__)
-
-# HTML page to request location from browser
-html_page = """
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>GPS Tracker</title>
-  </head>
-  <body>
+def start_gps_tracking():
+    """
+    Requests GPS coordinates from the user's browser and stores them in session state.
+    Works entirely inside Streamlit (no Flask).
+    """
+    st.markdown("""
     <h2>📍 Allow location access</h2>
     <p id="status">Waiting for permission...</p>
     <script>
-      navigator.geolocation.getCurrentPosition(function(position) {
-          fetch('/location', {
-              method: 'POST',
-              headers: {'Content-Type': 'application/json'},
-              body: JSON.stringify({
-                  latitude: position.coords.latitude,
-                  longitude: position.coords.longitude,
-                  accuracy: position.coords.accuracy
-              })
-          }).then(response => {
-              document.getElementById("status").innerText = "✅ Location sent!";
-          }).catch(error => {
-              document.getElementById("status").innerText = "❌ Failed to send location.";
-          });
-      }, function(error) {
-          document.getElementById("status").innerText = "❌ " + error.message;
-      });
+    navigator.geolocation.getCurrentPosition(
+        function(position) {
+            const data = {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+                accuracy: position.coords.accuracy
+            };
+            // Send data to Streamlit via custom event
+            const event = new CustomEvent("streamlitGPS", {detail: data});
+            window.dispatchEvent(event);
+            document.getElementById("status").innerText = "✅ Location captured!";
+        },
+        function(error) {
+            document.getElementById("status").innerText = "❌ " + error.message;
+        }
+    );
     </script>
-  </body>
-</html>
-"""
-
-@app.route('/')
-def index():
-    return render_template_string(html_page)
-
-@app.route('/location', methods=['POST'])
-def receive_location():
-    data = request.json
-    gps_data["latitude"] = data.get("latitude")
-    gps_data["longitude"] = data.get("longitude")
-    gps_data["accuracy"] = data.get("accuracy")
-    print(f"[📍] GPS: {gps_data}")
-    return {'status': 'ok'}
-
-def run_gps_server():
-    app.run(port=5050)
-
-def start_gps_tracking():
-    thread = threading.Thread(target=run_gps_server, daemon=True)
-    thread.start()
+    """, unsafe_allow_html=True)
 
 def get_gps_data():
-    lat = gps_data["latitude"]
-    lon = gps_data["longitude"]
-    acc = gps_data["accuracy"]
+    """
+    Returns the latest GPS coordinates stored in session state.
+    """
+    data = st.session_state.get("gps_data", {"latitude": None, "longitude": None, "accuracy": None})
+    lat = data["latitude"]
+    lon = data["longitude"]
+    acc = data["accuracy"]
     if lat is not None and lon is not None:
         return f"Latitude: {lat}, Longitude: {lon}, Accuracy: ±{acc} meters"
     else:
         return "📡 GPS data not received yet."
+
+# Event listener to update GPS coordinates
+# Streamlit runs this in every rerun
+st.experimental_rerun_trigger = st.session_state.get("gps_listener_added", False)
+if not st.experimental_rerun_trigger:
+    st.session_state.gps_listener_added = True
+    st.components.v1.html("""
+        <script>
+        window.addEventListener("streamlitGPS", (event) => {
+            const data = event.detail;
+            window.parent.postMessage(
+                {isStreamlitMessage: true, type: "streamlit:setComponentValue", value: data},
+                "*"
+            );
+        });
+        </script>
+    """, height=0)
