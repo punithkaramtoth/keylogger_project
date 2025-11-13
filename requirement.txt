@@ -3,7 +3,3 @@ pynput
 opencv-python-headless
 pyautogui
 geocoder
-flask
-requests
-geopy
-pandas
