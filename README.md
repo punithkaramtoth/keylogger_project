@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # 🛡️ Educational Keylogger Project
 
 ⚠️ For cybersecurity education and authorized use only!
