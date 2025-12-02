@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🛡️ Educational Keylogger Project
 
 ⚠️ For cybersecurity education and authorized use only!
@@ -15,3 +16,6 @@
 
 ```bash
 pip install -r requirements.txt
+=======
+# keylogger_project
+>>>>>>> 2a9b0733cb729a3a28343f4b81b67478380cab39
